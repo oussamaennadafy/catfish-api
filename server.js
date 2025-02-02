@@ -1,29 +1,33 @@
-const express = require('express')
-const app = express()
-const server = require('http').Server(app)
-const io = require('socket.io')(server)
-const { v4: uuidV4 } = require('uuid')
+import express from 'express';
+import { createServer } from "http";
+import { Server } from "socket.io";
+import 'dotenv/config';
 
-app.set('view engine', 'ejs')
-app.use(express.static('public'))
-
-app.get('/', (req, res) => {
-  res.redirect(`/${uuidV4()}`)
-})
-
-app.get('/:room', (req, res) => {
-  res.render('room', { roomId: req.params.room })
-})
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.NEXT_PUBLIC_CLIENT_URL
+  }
+});
 
 io.on('connection', socket => {
+  // listen if a user joins a room
   socket.on('join-room', (roomId, userId) => {
+    // make the user joins the room
     socket.join(roomId)
-    socket.to(roomId).broadcast.emit('user-connected', userId)
+    // wait fo the user to be ready
+    socket.on('ready', () => {
+      // notify all connected users to the specific room that a user is joined
+      socket.to(roomId).emit('user-connected', userId);
+    })
 
+    // listen in the user socket disconnect
     socket.on('disconnect', () => {
-      socket.to(roomId).broadcast.emit('user-disconnected', userId)
+      // notify all the  users to the specific room that a user is leaves
+      socket.to(roomId).emit('user-disconnected', userId);
     })
   })
 })
 
-server.listen(3000)
+httpServer.listen(process.env.PORT);
