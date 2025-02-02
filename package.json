@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server.js --omit=prod",
     "devStart": "nodemon server.js & peerjs --port 3001"
   },
   "keywords": [],
