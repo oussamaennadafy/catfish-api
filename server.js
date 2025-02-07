@@ -21,7 +21,6 @@ app.get('/', (req, res) => {
 io.on('connection', socket => {
   // listen if a user joins a room
   socket.on('join-room', (roomId, userId, roomType) => {
-    // console.log(`evet Emmited -> join-room | user -> ${userId} |  roomType -> ${roomType}`);
     // make the user joins the room
     socket.join(roomId)
     // wait fo the user to be ready
