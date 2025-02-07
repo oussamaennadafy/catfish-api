@@ -1,19 +1,27 @@
 import express from 'express';
 import { createServer } from "http";
 import { Server } from "socket.io";
+import cors from "cors";
 import 'dotenv/config';
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.NEXT_PUBLIC_CLIENT_URL
+    origin: "*"
   }
 });
 
+app.use(cors())
+
+app.get('/', (req, res) => {
+  res.json({ data: "server running..." })
+})
+
 io.on('connection', socket => {
   // listen if a user joins a room
-  socket.on('join-room', (roomId, userId) => {
+  socket.on('join-room', (roomId, userId, roomType) => {
+    // console.log(`evet Emmited -> join-room | user -> ${userId} |  roomType -> ${roomType}`);
     // make the user joins the room
     socket.join(roomId)
     // wait fo the user to be ready
