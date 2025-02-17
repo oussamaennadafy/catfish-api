@@ -20,11 +20,24 @@ export class RoomController {
       return newRoom;
     } else {
       // joins existing room
-      room.membersCount = room.membersCount + 1;
+      room.membersCount++;
       // calculate if room is full or still 
       room.isFull = isRoomFull(room.roomType, room.membersCount);
       room.save();
       return room;
+    }
+  }
+
+  static updateRoom = async (roomId) => {
+    const room = await Room.findOne({ where: { id: roomId } });
+    if (room == null) return;
+
+    if (room.membersCount === 1 && room.isFull === false) {
+      await room.destroy();
+    } else {
+      room.membersCount--;
+      room.isFull = false;
+      room.save();
     }
   }
 }

@@ -23,7 +23,6 @@ app.get('/', (req, res) => {
 io.on('connection', socket => {
   // listen if a user joins a room
   socket.on('join-room', async (userId, roomType) => {
-    console.log("join-room", { userId, roomType });
     const room = await RoomController.findOrCreateRoom(roomType);
     const roomId = room?.dataValues?.id;
     // make the user joins the room
@@ -31,10 +30,17 @@ io.on('connection', socket => {
     // notify all connected users to the specific room that a user is joined
     socket.to(roomId).emit('user-connected', userId);
 
+    // when user disconnected from room manually
+    socket.on('user-disconnected', async (userId) => {
+      socket.to(roomId).emit('user-disconnected', userId);
+      await RoomController.updateRoom(roomId);
+    })
+
     // listen in the user socket disconnect
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
       // notify all the  users to the specific room that a user is leaves
       socket.to(roomId).emit('user-disconnected', userId);
+      await RoomController.updateRoom(roomId);
     })
   })
 })
