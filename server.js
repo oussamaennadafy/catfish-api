@@ -45,4 +45,6 @@ io.on('connection', socket => {
   })
 })
 
-httpServer.listen(process.env.PORT);
+httpServer.listen(process.env.PORT, () => {
+  console.log(`Server running on http://localhost:${process.env.PORT} in ${process.env.NODE_ENV} mode.`);
+});

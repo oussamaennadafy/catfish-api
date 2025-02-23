@@ -1,16 +1,16 @@
 import { Sequelize } from 'sequelize';
 
 export const sequelize = new Sequelize({
-  database: "catfish_db",
-  username: "postgres",
-  password: "oussama.aws.rds.catfish",
-  host: "catfish.cmd8yamys2yk.us-east-1.rds.amazonaws.com",
-  port: 5432,
+  database: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_NAME : process.env.DEV_DATABASE_NAME,
+  username: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_USERNAME : process.env.DEV_DATABASE_USERNAME,
+  password: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_PASSWORD : process.env.DEV_DATABASE_PASSWORD,
+  host: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_HOST : process.env.DEV_DATABASE_HOST,
+  port: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_PORT : process.env.DEV_DATABASE_PORT,
   dialect: "postgres",
   dialectOptions: {
-    ssl: {
-      require: true, // This will help you. But you will see nwe error
-      rejectUnauthorized: false // This line will fix new error
-    }
+    ssl:  process.env.NODE_ENV === "production" ? {
+      require: true,
+      rejectUnauthorized: false
+    } : undefined,
   },
 });

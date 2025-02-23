@@ -1,12 +1,13 @@
 {
-  "name": "zoom-clone",
+  "name": "catfishmeet",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "devStart": "nodemon server.js"
+    "start": "NODE_ENV=production node server.js",
+    "dev": "NODE_ENV=development node server.js",
+    "devStart": "NODE_ENV=development nodemon server.js"
   },
   "keywords": [],
   "author": "",
