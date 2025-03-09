@@ -22,18 +22,23 @@ app.get('/', (req, res) => {
 
 io.on('connection', socket => {
   // listen if a user joins a room
-  socket.on('join-room', async (userId, roomType) => {
+  socket.on('join-room', async (userId, roomType, isCameraOpen) => {
     const room = await RoomController.findOrCreateRoom(roomType);
     const roomId = room?.dataValues?.id;
     // make the user joins the room
     socket.join(roomId);
     // notify all connected users to the specific room that a user is joined
-    socket.to(roomId).emit('user-connected', userId);
+    socket.to(roomId).emit('user-connected', userId, isCameraOpen);
 
     // when user disconnected from room manually
     socket.on('user-disconnected', async (userId) => {
       socket.to(roomId).emit('user-disconnected', userId);
       await RoomController.updateRoom(roomId);
+    })
+    
+    // when user toggle camera
+    socket.on('toggle-camera', async (userId, isCameraOpen) => {
+      socket.to(roomId).emit('toggle-camera', userId, isCameraOpen);
     })
 
     // listen in the user socket disconnect
