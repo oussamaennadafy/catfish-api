@@ -35,11 +35,6 @@ io.on('connection', socket => {
       socket.to(roomId).emit('user-disconnected', userId);
       await RoomController.updateRoom(roomId);
     })
-    
-    // when user toggle camera
-    socket.on('toggle-camera', async (userId, isCameraOpen) => {
-      socket.to(roomId).emit('toggle-camera', userId, isCameraOpen);
-    })
 
     // listen in the user socket disconnect
     socket.on('disconnect', async () => {
