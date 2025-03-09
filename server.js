@@ -36,6 +36,11 @@ io.on('connection', socket => {
       await RoomController.updateRoom(roomId);
     })
 
+    // broadcast toggle-camera to notify all users that the curent user toggle his camera
+    socket.on('toggle-camera', async (isCameraOpen) => {
+      socket.to(roomId).emit('toggle-camera', isCameraOpen);
+    })
+
     // listen in the user socket disconnect
     socket.on('disconnect', async () => {
       // notify all the  users to the specific room that a user is leaves
