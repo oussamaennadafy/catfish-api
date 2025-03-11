@@ -8,8 +8,5 @@ cd ..
 chmod 400 "casablanca-oussama-mac.pem"
 ssh -i "casablanca-oussama-mac.pem" ubuntu@ec2-18-212-206-197.compute-1.amazonaws.com
 
-# caddy file
-sudo vim /etc/caddy/Caddyfile
-
-# restart caddy
-sudo systemctl restart caddy
+# restart background service
+sudo systemctl restart myapp.service
