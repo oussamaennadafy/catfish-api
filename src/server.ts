@@ -3,8 +3,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import 'dotenv/config';
-import './config/database.js';
-import { RoomController } from './controllers/roomController.js';
+import './config/database.ts';
+import RoomController from './features/roms/controllers/roomController.ts';
 
 const app = express();
 const httpServer = createServer(app);
@@ -17,7 +17,7 @@ const io = new Server(httpServer, {
 app.use(cors())
 
 app.get('/', (req, res) => {
-  res.json({ data: "now socket has not nested listnners..." })
+  res.json({ data: "now we use typescript..." })
 })
 
 io.on('connection', socket => {

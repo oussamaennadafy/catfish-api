@@ -1,4 +1,4 @@
-export const RoomTypes = {
+export enum RoomType {
   twoUsers,
   shuffle,
   threeUsers,

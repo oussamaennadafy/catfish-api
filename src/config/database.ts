@@ -5,7 +5,7 @@ export const sequelize = new Sequelize({
   username: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_USERNAME : process.env.DEV_DATABASE_USERNAME,
   password: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_PASSWORD : process.env.DEV_DATABASE_PASSWORD,
   host: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_HOST : process.env.DEV_DATABASE_HOST,
-  port: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_PORT : process.env.DEV_DATABASE_PORT,
+  port: process.env.NODE_ENV === "production" ? Number(process.env.PROD_DATABASE_PORT) : Number(process.env.DEV_DATABASE_PORT),
   dialect: "postgres",
   dialectOptions: {
     ssl:  process.env.NODE_ENV === "production" ? {
