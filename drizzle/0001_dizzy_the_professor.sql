@@ -1,0 +1,1 @@
+ALTER TABLE "waiting_queue" ADD PRIMARY KEY ("id");

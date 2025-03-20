@@ -1,0 +1,6 @@
+export enum RoomTypeEnum {
+  TWO_USERS = "TWO_USERS",
+  THREE_USERS = "THREE_USERS",
+  NINE_USERS = "NINE_USERS",
+  SHUFFLE = "SHUFFLE",
+}

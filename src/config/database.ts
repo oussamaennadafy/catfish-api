@@ -1,16 +1,11 @@
-import { Sequelize } from 'sequelize';
+import { drizzle } from "drizzle-orm/node-postgres"
 
-export const sequelize = new Sequelize({
-  database: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_NAME : process.env.DEV_DATABASE_NAME,
-  username: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_USERNAME : process.env.DEV_DATABASE_USERNAME,
-  password: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_PASSWORD : process.env.DEV_DATABASE_PASSWORD,
-  host: process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_HOST : process.env.DEV_DATABASE_HOST,
-  port: process.env.NODE_ENV === "production" ? Number(process.env.PROD_DATABASE_PORT) : Number(process.env.DEV_DATABASE_PORT),
-  dialect: "postgres",
-  dialectOptions: {
-    ssl:  process.env.NODE_ENV === "production" ? {
-      require: true,
-      rejectUnauthorized: false
-    } : undefined,
-  },
-});
+const DATABASE_NAME = process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_NAME : process.env.DEV_DATABASE_NAME;
+const DATABASE_USERNAME = process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_USERNAME : process.env.DEV_DATABASE_USERNAME;
+const DATABASE_PASSWORD = process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_PASSWORD : process.env.DEV_DATABASE_PASSWORD;
+const DATABASE_HOST = process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_HOST : process.env.DEV_DATABASE_HOST;
+const DATABASE_PORT = process.env.NODE_ENV === "production" ? process.env.PROD_DATABASE_PORT : process.env.DEV_DATABASE_PORT;
+
+export const DB_URL = `postgres://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}`;
+
+export const db = drizzle(DB_URL);
