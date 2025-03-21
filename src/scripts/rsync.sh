@@ -15,4 +15,4 @@ sudo systemctl restart myapp.service
 sudo vim /etc/systemd/system/myapp.service
 
 # reload units after changing service config file
-systemctl daemon-reload
+sudo systemctl daemon-reload
