@@ -10,5 +10,6 @@ export default defineConfig({
   ],
   dbCredentials: {
     url: DB_URL,
+    ssl: process.env.NODE_ENV === "production" ? true : false
   },
 })
