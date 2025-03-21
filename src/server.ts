@@ -12,6 +12,7 @@ import compression from 'compression';
 import AppError from '@/common/classes/AppError.ts';
 import userRouter from '@/features/authentication/routes/UserRoutes.ts';
 import globalErrorHandler from './common/controllers/errorController.ts';
+import SocketManager from './events/socketManager.ts';
 
 const app = express();
 const httpServer = createServer(app);
@@ -43,6 +44,9 @@ app.use(compression());
 
 // 3) ROUTES
 app.use('/api/v1/users', userRouter);
+
+// io middleware to attach user to socket
+io.use(SocketManager.protect);
 
 // Initialize Socket.IO
 initializeSocketIO(io);

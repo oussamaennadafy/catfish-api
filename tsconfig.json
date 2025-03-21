@@ -8,6 +8,7 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "noUnusedLocals": true,
     "baseUrl": "./",
     "paths": {

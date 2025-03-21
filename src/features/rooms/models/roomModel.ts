@@ -5,6 +5,6 @@ import { enumToPgEnum } from "@/utils/database/enumToPgEnum.ts";
 export const roomModel = pgTable('rooms', {
   id: serial("id").primaryKey(),
   type: varchar('type', { enum: enumToPgEnum(RoomTypeEnum) }).notNull(),
-  membersCount: integer("members_count").default(1),
+  membersCount: integer("members_count").default(2),
   isFull: boolean("is_full").default(false),
 });

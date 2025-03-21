@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, boolean, timestamp, unique } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, boolean, timestamp, unique, integer } from 'drizzle-orm/pg-core';
 import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm';
 import { db } from '@/config/database.ts';
 import { eq, and } from 'drizzle-orm';
@@ -17,10 +17,10 @@ export const users = pgTable('users', {
   passwordResetToken: varchar('password_reset_token', { length: 255 }),
   passwordResetExpires: timestamp('password_reset_expires'),
   active: boolean('active').default(true),
+  joinedRoom: integer("joined_room"),
+  socketId: varchar('socket_id'),
 }, (table) => {
-  return {
-    emailUnique: unique().on(table.email),
-  };
+  return [unique().on(table.email)];
 });
 
 // Export types using the non-deprecated approach

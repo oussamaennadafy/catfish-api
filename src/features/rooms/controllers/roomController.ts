@@ -1,25 +1,30 @@
 import { Socket, Server as SocketIOServer } from "socket.io";
 import { waitingQueueModel } from "@/features/rooms/models/waitingQueueModel.ts";
 import { RoomEvents } from "@/features/rooms/constants/events.ts";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { roomModel } from "@/features/rooms/models/roomModel.ts";
 import { RoomTypeEnum } from "@/features/rooms/types/roomTypes.ts";
 import { db } from "@/config/database.ts";
+import { User, users } from "@/features/authentication/models/userModel.ts";
 
 export default class RoomHandler {
   private io: SocketIOServer;
-  private joinedRoomId: number;
 
   constructor(io: SocketIOServer) {
     this.io = io;
   }
 
-  public handleConnection(socket: Socket): void {
+  public async handleConnection(socket: Socket) {
+    // update users socket
+    await db.update(users).set({
+      socketId: socket.id,
+    } as unknown).where(eq(users.id, socket.data.user.id))
+
     // Listen if a user joins a room
     socket.on(RoomEvents.client.JOIN_ROOM, async (roomType: string) => this.joinRoomHandler(socket, roomType));
 
     // when users leave room
-    socket.on(RoomEvents.client.LEAVE_ROOM, async () => this.leaveRoomHandler(socket));
+    socket.on(RoomEvents.client.LEAVE_ROOM, async () => RoomHandler.leaveRoomHandler(socket));
   }
 
   /**
@@ -30,17 +35,18 @@ export default class RoomHandler {
    * @returns void
    */
   private async joinRoomHandler(socket: Socket, roomType: string) {
-    // guard clause for auth
-    if(!socket.handshake.auth.token) return;
+    const currentUser: User = socket.data.user;
 
     // check if some users are waiting
     const waitingUser = (await db.select().from(waitingQueueModel).where(eq(waitingQueueModel.roomType, roomType))).at(0);
-    // if no matching found let bo wait
+
+    // if no matching found let bro wait
     if (!waitingUser) {
       // let bro have a seat in the database
       await db.insert(waitingQueueModel).values({
         socketId: socket.id,
         roomType: roomType,
+        userId: currentUser.id,
       });
       return;
     }
@@ -49,24 +55,31 @@ export default class RoomHandler {
     if (waitingUser) {
       // remove user from waiting room
       await db.delete(waitingQueueModel).where(eq(waitingQueueModel.id, waitingUser.id));
+
+      // emit event to users that a user is connected
+      const waitingUserSocket = this.io.sockets.sockets.get(waitingUser.socketId);
+      if (!waitingUserSocket) return;
+
       // create a room
       const insertedRoom = await db.insert(roomModel).values({
         type: RoomTypeEnum[roomType],
       }).returning();
       const insertedRoomId: number = insertedRoom.at(0).id;
-      // emit event to users that a user is connected
-      const waitingUserSocket = this.io.sockets.sockets.get(waitingUser.socketId);
-      // update room membersCount
-      await db.update(roomModel).set({ [roomModel.membersCount.name]: 2 }).where(eq(roomModel.id, insertedRoomId));
+
       // join both users to same room
       waitingUserSocket.join(insertedRoomId.toString());
       socket.join(insertedRoomId.toString());
-      // save room id
-      this.joinedRoomId = insertedRoomId;
+
+      // update users in db with new joined room
+      await db.update(users).set({
+        joinedRoom: insertedRoomId,
+      } as unknown).where(or(
+        eq(users.id, currentUser.id),
+        eq(users.id, waitingUser.userId),
+      ));
 
       // notify both users that a user is joined
-      waitingUserSocket.emit(RoomEvents.server.USER_JOINED, "some one come, sorry for waiting...")
-      socket.emit(RoomEvents.server.USER_JOINED, "someone was waiting for youu bro...");
+      waitingUserSocket.emit(RoomEvents.server.USER_JOINED, socket.data.user.id);
     }
   }
 
@@ -76,17 +89,41 @@ export default class RoomHandler {
    * @param socket 
    * @returns void
    */
-  private async leaveRoomHandler(socket: Socket) {
-    // get the room row
-    // const room = (await db.select().from(roomModel).where(eq(roomModel.id, this.joinedRoomId))).at(0);
+  static async leaveRoomHandler(socket: Socket) {
+    // get current user
+    const currentUser: User = (await db.select().from(users).where(eq(users.id, socket.data.user.id))).at(0);
 
-    // // if room will have only one sad bro delete it 
-    // if (room.membersCount > 2) {
+    // get the room
+    const room = (await db.select().from(roomModel).where(eq(roomModel.id, currentUser.joinedRoom))).at(0);
 
-    // }
-    // // disconnect from room socket
-    // socket.leave(this.joinedRoomId.toString());
-    // console.log(room.membersCount);
+    // if room will have only one sad bro delete it
+    if (room?.membersCount <= 2) {
+      const usersInRoom = await db.select().from(users).where(eq(users.joinedRoom, room.id));
+
+      // make last one in waiting queue
+      const lastUserInRoom = usersInRoom.filter(user => user.id !== socket.data.user.id).at(0);
+
+      await db.insert(waitingQueueModel).values({
+        socketId: lastUserInRoom.socketId,
+        roomType: room.type,
+        userId: lastUserInRoom.id,
+      });
+
+      // update joinedRoom users in room
+      for (let i = 0; i < usersInRoom.length; i++) {
+        await db.update(users).set({
+          joinedRoom: null,
+        } as unknown).where(eq(users.id, usersInRoom[i].id));
+      }
+
+      // delete room
+      await db.delete(roomModel).where(eq(roomModel.id, room.id));
+
+      // remove user from waiting
+      await db.delete(waitingQueueModel).where(eq(waitingQueueModel.userId, socket.data.user.id));
+    }
+    // disconnect from room socket
+    socket.leave(room?.id?.toString());
   }
 
 }

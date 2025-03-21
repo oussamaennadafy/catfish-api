@@ -1,11 +1,6 @@
-import { Socket, Server as SocketIOServer } from 'socket.io';
+import { Socket } from 'socket.io';
 
 export default class ChatHandler {
-  private io: SocketIOServer;
-  
-  constructor(io: SocketIOServer) {
-    this.io = io;
-  }
   
   public handleConnection(socket: Socket): void {
     // Chat-related socket events

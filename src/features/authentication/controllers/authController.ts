@@ -6,13 +6,15 @@ import AppError from '@/common/classes/AppError.ts';
 import Email from '@/helpers/email.ts';
 import { UserModel } from '../models/userModel.ts';
 import Cookies from "js-cookie"
-
-const verifyAsync = promisify<string, string, JwtPayload>(jwt.verify as any);
+import getUserFromToken from '../helpers/getUserFromToken.ts';
 
 interface JwtPayload {
   id: number;
   iat: number;
 }
+
+const verifyAsync = promisify<string, string, JwtPayload>(jwt.verify as any);
+
 
 // Create JWT token
 const signToken = (id: number): string => {
@@ -103,17 +105,14 @@ export const protect = catchAsync(async (req: Request & { user?: any }, res: Res
     return next(new AppError('You are not logged in! Please log in to get access.', 401));
   }
 
-  // Then use it in your code:
-  const decoded = await verifyAsync(token, process.env.JWT_SECRET!);
+  const { currentUser, iat } = await getUserFromToken(token);
 
-  // Check if user still exists
-  const currentUser = await UserModel.findById(decoded.id);
   if (!currentUser) {
     return next(new AppError('The user belonging to this token does no longer exist.', 401));
   }
 
   // Check if user changed password after the token was issued
-  if (UserModel.changedPasswordAfter(currentUser, decoded.iat)) {
+  if (UserModel.changedPasswordAfter(currentUser, iat)) {
     return next(new AppError('User recently changed password! Please log in again.', 401));
   }
 
