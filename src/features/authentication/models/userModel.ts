@@ -5,6 +5,7 @@ import { eq, and } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import validator from 'validator';
+import { roomModel } from '@/features/rooms/models/roomModel.ts';
 
 // Define the User schema
 export const users = pgTable('users', {
@@ -17,7 +18,7 @@ export const users = pgTable('users', {
   passwordResetToken: varchar('password_reset_token', { length: 255 }),
   passwordResetExpires: timestamp('password_reset_expires'),
   active: boolean('active').default(true),
-  joinedRoom: integer("joined_room"),
+  joinedRoom: integer("joined_room").references(() => roomModel.id), // this is a foreign key
   socketId: varchar('socket_id'),
 }, (table) => {
   return [unique().on(table.email)];

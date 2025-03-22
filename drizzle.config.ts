@@ -1,5 +1,6 @@
 import { defineConfig } from "drizzle-kit";
-import { DB_URL } from "./src/config/database"
+
+const isProduction = process.env.NODE_ENV === "production";
 
 export default defineConfig({
   dialect: "postgresql",
@@ -9,7 +10,11 @@ export default defineConfig({
     "./src/features/authentication/models",
   ],
   dbCredentials: {
-    url: DB_URL,
-    ssl: process.env.NODE_ENV === "production" ? true : false
+    host: isProduction ? process.env.PROD_DATABASE_HOST! : process.env.DEV_DATABASE_HOST!,
+    user: isProduction ? process.env.PROD_DATABASE_USERNAME! : process.env.DEV_DATABASE_USERNAME!,
+    password: isProduction ? process.env.PROD_DATABASE_PASSWORD! : process.env.DEV_DATABASE_PASSWORD!,
+    database: isProduction ? process.env.PROD_DATABASE_NAME! : process.env.DEV_DATABASE_NAME!,
+    port: Number(isProduction ? process.env.PROD_DATABASE_PORT! : process.env.DEV_DATABASE_PORT!),
+    ssl: true,
   },
-})
+});

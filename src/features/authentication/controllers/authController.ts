@@ -77,7 +77,7 @@ export const login = catchAsync(async (req: Request, res: Response, next: NextFu
   if (!user || !(await UserModel.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
-  
+
   // Send token to client
   createSendToken(user, 200, req, res);
 });

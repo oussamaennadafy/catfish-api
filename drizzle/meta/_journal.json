@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1741959001810,
-      "tag": "0000_narrow_flatman",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1741959281143,
-      "tag": "0001_dizzy_the_professor",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1741959320864,
-      "tag": "0002_polite_ego",
+      "when": 1742652072377,
+      "tag": "0000_next_victor_mancha",
       "breakpoints": true
     }
   ]

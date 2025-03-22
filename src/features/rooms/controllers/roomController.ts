@@ -15,6 +15,10 @@ export default class RoomHandler {
   }
 
   public async handleConnection(socket: Socket) {
+    if(!socket.data.user) {
+      console.log("we dont have user token");
+      return;
+    }
     // update users socket
     await db.update(users).set({
       socketId: socket.id,
