@@ -1,7 +1,7 @@
 import { Socket, Server as SocketIOServer } from "socket.io";
 import { waitingQueueModel } from "@/features/rooms/models/waitingQueueModel.ts";
 import { RoomEvents } from "@/features/rooms/constants/events.ts";
-import { eq, or } from "drizzle-orm";
+import { and, eq, ne, or } from "drizzle-orm";
 import { roomModel } from "@/features/rooms/models/roomModel.ts";
 import { RoomTypeEnum } from "@/features/rooms/types/roomTypes.ts";
 import { db } from "@/config/database.ts";
@@ -15,7 +15,7 @@ export default class RoomHandler {
   }
 
   public async handleConnection(socket: Socket) {
-    if(!socket.data.user) {
+    if (!socket.data.user) {
       console.log("we dont have user token");
       return;
     }
@@ -42,7 +42,10 @@ export default class RoomHandler {
     const currentUser: User = socket.data.user;
 
     // check if some users are waiting
-    const waitingUser = (await db.select().from(waitingQueueModel).where(eq(waitingQueueModel.roomType, roomType))).at(0);
+    const waitingUser = (await db.select().from(waitingQueueModel).where(and(
+      eq(waitingQueueModel.roomType, roomType),
+      ne(waitingQueueModel.userId, currentUser.id),
+    ))).at(0);
 
     // if no matching found let bro wait
     if (!waitingUser) {
@@ -125,6 +128,9 @@ export default class RoomHandler {
 
       // remove user from waiting
       await db.delete(waitingQueueModel).where(eq(waitingQueueModel.userId, socket.data.user.id));
+
+      // emit to user that he`s ready to join new room
+      socket.emit(RoomEvents.server.READY_TO_JOIN);
     }
     // disconnect from room socket
     socket.leave(room?.id?.toString());

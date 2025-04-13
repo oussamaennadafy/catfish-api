@@ -16,3 +16,6 @@ sudo vim /etc/systemd/system/myapp.service
 
 # reload units after changing service config file
 sudo systemctl daemon-reload
+
+# show log tail of prod service
+sudo journalctl -fu myapp.service
