@@ -10,9 +10,8 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import AppError from '@/common/classes/AppError.ts';
-import userRouter from '@/features/authentication/routes/UserRoutes.ts';
 import globalErrorHandler from './common/controllers/errorController.ts';
-import SocketManager from './events/socketManager.ts';
+import { DB_URL } from './config/database.ts';
 
 const app = express();
 const httpServer = createServer(app);
@@ -42,12 +41,6 @@ app.use(cookieParser());
 // Data sanitization against XSS
 app.use(compression());
 
-// 3) ROUTES
-app.use('/api/v1/users', userRouter);
-
-// io middleware to attach user to socket
-io.use(SocketManager.protect);
-
 // Initialize Socket.IO
 initializeSocketIO(io);
 
@@ -59,5 +52,5 @@ app.all('*', (req, res, next) => {
 app.use(globalErrorHandler);
 
 httpServer.listen(process.env.PORT, () => {
-  console.log(`Server running on http://localhost:${process.env.PORT} in ${process.env.NODE_ENV} mode.`);
+  console.log(`Server running on http://localhost:${process.env.PORT} in ${process.env.NODE_ENV} mode, DB_URL = ${DB_URL}, NODE_ENV = ${process.env.NODE_ENV}`);
 });

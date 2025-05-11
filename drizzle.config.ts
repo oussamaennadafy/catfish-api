@@ -15,6 +15,6 @@ export default defineConfig({
     password: isProduction ? process.env.PROD_DATABASE_PASSWORD! : process.env.DEV_DATABASE_PASSWORD!,
     database: isProduction ? process.env.PROD_DATABASE_NAME! : process.env.DEV_DATABASE_NAME!,
     port: Number(isProduction ? process.env.PROD_DATABASE_PORT! : process.env.DEV_DATABASE_PORT!),
-    ssl: true,
+    ssl: process.env.NODE_ENV === "production",
   },
 });

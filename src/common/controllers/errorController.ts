@@ -1,12 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import AppError from "../classes/AppError.ts";
 
-const handleJWTError = () =>
-  new AppError('Invalid token. Please log in again!', 401);
-
-const handleJWTExpiredError = () =>
-  new AppError('Your token has expired! Please log in again.', 401);
-
 const sendErrorDev = (err: any, req: Request, res: Response) => {
   return res.status(err.statusCode).json({
     status: err.status,
@@ -42,9 +36,6 @@ const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFun
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
     error.message = err.message;
-
-    if (error.name === 'JsonWebTokenError') error = handleJWTError();
-    if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
 
     sendErrorProd(error, req, res);
   }
