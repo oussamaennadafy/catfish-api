@@ -1,5 +1,55 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1748987506938,
+      "tag": "0000_first_chronomancer",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1748987950407,
+      "tag": "0001_groovy_betty_ross",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1748988053950,
+      "tag": "0002_windy_zombie",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1749026186457,
+      "tag": "0003_red_smasher",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1749026439428,
+      "tag": "0004_icy_marvel_boy",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1749027084637,
+      "tag": "0005_ambitious_sharon_carter",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1749041537698,
+      "tag": "0006_cool_freak",
+      "breakpoints": true
+    }
+  ]
 }

@@ -1,4 +1,4 @@
-import { Socket, Server as SocketIOServer } from "socket.io";
+import { DisconnectReason, Socket, Server as SocketIOServer } from "socket.io";
 import RoomHandler from "@/features/rooms/controllers/roomController.ts";
 import ChatHandler from "./handlers/chatHandler.ts";
 
@@ -22,9 +22,8 @@ export default class SocketManager {
       this.roomHandler.handleConnection(socket);
       this.chatHandler.handleConnection(socket);
 
-      socket.on('disconnect', (socket) => {
-        console.log(socket);
-        // RoomHandler.leaveRoomHandler(socket);
+      socket.on('disconnect', (reason: DisconnectReason) => {
+        RoomHandler.leaveRoomHandler(socket);
       });
     });
   }

@@ -1,0 +1,1 @@
+ALTER TABLE "rooms" ALTER COLUMN "is_full" SET DEFAULT true;

@@ -1,0 +1,1 @@
+ALTER TABLE "waiting_queue" RENAME COLUMN "userId" TO "user_id";

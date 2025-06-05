@@ -1,0 +1,1 @@
+ALTER TABLE "rooms" ADD COLUMN "members_count" integer DEFAULT 1;

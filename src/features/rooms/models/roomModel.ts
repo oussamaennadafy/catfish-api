@@ -1,10 +1,7 @@
-import { boolean, integer, pgTable, serial, varchar } from "drizzle-orm/pg-core";
-import { RoomTypeEnum } from "../types/roomTypes.ts";
-import { enumToPgEnum } from "@/utils/database/enumToPgEnum.ts";
+import { boolean, pgTable, serial, integer } from "drizzle-orm/pg-core";
 
 export const roomModel = pgTable('rooms', {
   id: serial("id").primaryKey(),
-  type: varchar('type', { enum: enumToPgEnum(RoomTypeEnum) }).notNull(),
-  membersCount: integer("members_count").default(2),
   isFull: boolean("is_full").default(false),
+  membersCount: integer("members_count").default(1),
 });
