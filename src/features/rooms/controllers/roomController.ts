@@ -23,6 +23,9 @@ export default class RoomHandler {
 
     // when user toggle mic
     socket.on(RoomEvents.client.TOGGLE_MIC, async (userId: string, alsoEmitToMe: boolean) => this.ToogleMicHandler(socket, userId, alsoEmitToMe));
+
+    // when user toggle mic
+    socket.on(RoomEvents.client.STREAM_STARTED, async () => this.StreamStartedHandler(socket));
   }
 
   /**
@@ -107,6 +110,17 @@ export default class RoomHandler {
     if (alsoEmitToMe) {
       socket.emit(RoomEvents.server.MIC_TOGGLED, userId);
     }
+  }
+
+
+  /**
+   * @description this function hanlde all logic of stream started room event
+   * @param socket
+   * @returns Promise<void>
+  */
+  private async StreamStartedHandler(socket: Socket) {
+    const roomID = socket.data["roomID"];
+    socket.to(roomID).emit(RoomEvents.server.STREAM_STARTED);
   }
 
 }
