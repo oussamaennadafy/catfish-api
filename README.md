@@ -1,10 +1,47 @@
-Catfish API (Real‑time Rooms & Chat)
+## 🐟 Catfish API — Real‑time Rooms & Chat
 
-Overview
+![Node](https://img.shields.io/badge/Node-18%2B-339933?logo=node.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4.x-000000?logo=express&logoColor=white)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-4.x-010101?logo=socketdotio&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13%2B-4169E1?logo=postgresql&logoColor=white)
+![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-0.40-0A7E07)
+![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+
+<details>
+<summary><strong>Table of contents</strong></summary>
+
+- [Overview](#-overview)
+- [Key features](#-key-features)
+- [Tech stack](#-tech-stack)
+- [Getting started](#-getting-started)
+  - [Prerequisites](#-prerequisites)
+  - [Installation](#-installation)
+  - [Environment variables](#-environment-variables)
+  - [Database setup](#-database-setup)
+  - [Run the server](#-run-the-server)
+- [Project structure](#-project-structure)
+- [Database schema](#-database-schema)
+- [Runtime behavior](#-runtime-behavior)
+- [WebSocket API](#-websocket-api-socketio)
+  - [Rooms events](#-rooms-events)
+  - [Chat events](#-chat-events)
+  - [Client usage example](#-client-usage-example)
+- [HTTP surface](#-http-surface)
+- [Security & production notes](#-security--production-notes)
+- [Scripts](#-scripts)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Troubleshooting](#-troubleshooting)
+
+</details>
+
+### 📖 Overview
 
 Catfish API is a real‑time backend built with Node.js, TypeScript, Express, Socket.IO, and Drizzle ORM (PostgreSQL). It manages ephemeral 1:1 rooms, basic chat messaging, and room state toggles (camera/mic/stream) over WebSockets.
 
-Key features
+### ✨ Key features
 
 - Real‑time signaling: Socket.IO server with namespaced event contracts
 - Room lifecycle: Auto‑create/join, mark full, leave, and cleanup
@@ -12,7 +49,7 @@ Key features
 - Secure & production‑ready defaults: Helmet, CORS, compression, morgan
 - PostgreSQL with Drizzle ORM and migrations
 
-Tech stack
+### 🧰 Tech stack
 
 - Runtime: Node.js (ESM) + TypeScript
 - HTTP: Express (minimal REST; primary interface is WebSockets)
@@ -20,20 +57,20 @@ Tech stack
 - Database: PostgreSQL via Drizzle ORM
 - Migrations: drizzle-kit + node-postgres migrator
 
-Getting started
+### 🚀 Getting started
 
-Prerequisites
+#### ✅ Prerequisites
 
 - Node.js 18+
 - PostgreSQL 13+
 
-Installation
+#### 📦 Installation
 
 ```bash
 npm install
 ```
 
-Environment variables
+#### 🔧 Environment variables
 
 Create a .env file at the repo root. The server dynamically chooses development vs production credentials based on NODE_ENV. All variables are required in their respective environment.
 
@@ -57,7 +94,7 @@ PROD_DATABASE_USERNAME=<user>
 PROD_DATABASE_PASSWORD=<password>
 ```
 
-Database setup
+#### 🗄️ Database setup
 
 1) Create the database(s) listed above.
 2) Run migrations:
@@ -68,7 +105,7 @@ npx tsx migrate.ts
 
 This uses the drizzle migrator to apply SQL files under drizzle/.
 
-Run the server
+#### 🏃 Run the server
 
 - Development (watch mode):
 
@@ -84,7 +121,7 @@ npm run start
 
 When the server starts, it logs the URL and DB connection status. By default CORS is open (origin: "*") for Socket.IO; adjust for your deployment needs.
 
-Project structure
+### 🗂️ Project structure
 
 ```text
 src/
@@ -110,15 +147,15 @@ drizzle/                         # SQL migrations
 migrate.ts                       # Migration runner
 ```
 
-Database schema
+### 🧱 Database schema
 
-Table rooms
+#### Table: rooms
 
 - id: serial primary key
 - is_full: boolean (default false)
 - members_count: integer (default 1)
 
-Runtime behavior
+### 🔁 Runtime behavior
 
 - On first user join when no room is available, create a room and join them.
 - On second user join, mark the room as full (members_count=2) and notify the peer.
@@ -127,11 +164,11 @@ Runtime behavior
   - If members_count was 1 → delete the room
   - Emit ready-to-join to the caller
 
-WebSocket API (Socket.IO)
+### 🔌 WebSocket API (Socket.IO)
 
 Namespace: default (/) — all events are emitted/listened on the connected socket.
 
-Rooms events
+#### 🏠 Rooms events
 
 Client → Server
 
@@ -149,7 +186,7 @@ Server → Client
 - ready-to-join ()
 - stream-started ()
 
-Chat events
+#### 💬 Chat events
 
 Client → Server
 
@@ -159,7 +196,7 @@ Server → Client
 
 - receive-message (same payload as above)
 
-Client usage example
+#### 🧪 Client usage example
 
 ```ts
 import { io } from "socket.io-client";
@@ -200,36 +237,36 @@ function startStream() {
 }
 ```
 
-HTTP surface
+### 🌐 HTTP surface
 
 The HTTP API is intentionally minimal. Any non‑defined route returns a 404 in JSON via the global error handler. Real‑time communication is the primary interface.
 
-Security & production notes
+### 🔐 Security & production notes
 
 - Helmet is enabled for HTTP security headers.
 - CORS defaults to origin: "*" for Socket.IO; scope as needed.
 - Compression is enabled.
 - In production, the database connection uses sslmode=no-verify in the URL; ensure your environment requires/accepts SSL and tighten as appropriate.
 
-Scripts
+### 🛠️ Scripts
 
 - npm run dev — Start server in watch mode (development)
 - npm run start — Start server (production)
 - npm run build — TypeScript build
 - npx tsx migrate.ts — Apply DB migrations
 
-Contributing
+### 🤝 Contributing
 
 1) Fork the repository and create a feature branch.
 2) Write clear, typed code and keep functions small and purposeful.
 3) Add tests where applicable (server currently does not include a test harness).
 4) Open a pull request with a concise description and screenshots/logs if relevant.
 
-License
+### 📄 License
 
 ISC (see package.json). You may adapt license as needed for your organization.
 
-Troubleshooting
+### 🩺 Troubleshooting
 
 - ECONNREFUSED when connecting to DB: verify host/port, credentials, and that the DB is reachable.
 - Socket doesn’t receive events: confirm the socket joined a room (join-room) and that socket.data["roomID"] is set by the server after joining.
